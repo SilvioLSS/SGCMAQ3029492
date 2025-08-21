@@ -1,0 +1,8 @@
+#Tomcat 
+/opt/apache-tomcat10
+
+#Commit & Push
+git config --global user.name "SilvioLSS"
+git config --global user.email "silvioluizs.santos@gmail.com"
+
+
