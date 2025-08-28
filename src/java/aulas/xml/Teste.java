@@ -1,10 +1,11 @@
 package aulas.xml;
 
-import logtrack.ExceptionLogTrack;
+import LogTrack.ExceptionLogTrack;
 
 public class Teste {
     public static void main(String[] args) {
         
+        ExceptionLogTrack.getInstance().addLog( new Exception("Teste!") );
         
     }
 }
