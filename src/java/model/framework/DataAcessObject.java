@@ -1,9 +1,18 @@
 package model.framework;
 
+import java.sql.Connection;
+import controller.AppConfig;
 import java.util.HashMap;
+import java.util.StringJoiner;
+import java.sql.SQLException;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public abstract class DataAcessObject {
-    
+
     private String tableEntity;
     private boolean novelEntity;
     private boolean changedEntity;
@@ -29,12 +38,12 @@ public abstract class DataAcessObject {
     }
 
     private void setTableEntity(String tableEntity) {
-        if(tableEntity != null && !tableEntity.isEmpty() && !tableEntity.isBlank()){
+        if (tableEntity != null && !tableEntity.isEmpty() && !tableEntity.isBlank()) {
             this.tableEntity = tableEntity;
         } else {
             throw new IllegalArgumentException("table must be valid");
         }
-        
+
     }
 
     protected void setNovelEntity(boolean novelEntity) {
@@ -43,27 +52,87 @@ public abstract class DataAcessObject {
 
     protected void setChangedEntity(boolean changedEntity) {
         this.changedEntity = changedEntity;
-        if( this.changedEntity == false ){
+        if (this.changedEntity == false) {
             dirtyFields.clear();
         }
     }
-    
-    protected void addChange(String field, Object value){
+
+    protected void addChange(String field, Object value) {
         dirtyFields.put(field, value);
         setChangedEntity(true);
     }
-    
-    private void insert(){
-        System.out.println("insert()");
+
+    private void insert() throws SQLException {
+
+        String dml = "INSERT INTO " + getTableEntity();
+
+        StringJoiner fields = new StringJoiner(",");
+        StringJoiner values = new StringJoiner(",");
+
+        for (String field : dirtyFields.keySet()) {
+            fields.add(field);
+            values.add("?");
+        }
+
+        dml += " (" + fields + ") VALUES (" + values + ")";
+
+        if (AppConfig.getInstance().isVerbose()) {
+            System.out.println(dml);
+
+            Connection con = DataBaseConnections.getInstance().getConnection();
+            PreparedStatement pst = con.prepareStatement(dml);
+
+            int index = 1;
+            for (String field : dirtyFields.keySet()) {
+                pst.setObject(index, dirtyFields.get(field));
+                index++;
+            }
+            
+            if (AppConfig.getInstance().isVerbose()) {
+                System.out.println(pst);
+                pst.execute();
+                pst.close();
+                DataBaseConnections.getInstance().closeConnection(con);
+            }
+        }       
+
     }
-    
-    private void update(){
-        System.out.println("update()");
+
+    private void update() throws SQLException{
+        String dml = "UPDATE " + getTableEntity();
+                
+        StringJoiner changes = new StringJoiner(",");
+        
+        for(String field : dirtyFields.keySet()){
+            changes.add(field + " = ? ");
+        }
+        
+        dml += changes + " WHERE " + getWhereClauseForOneEntity();
+        
+        if( AppConfig.getInstance().isVerbose() ){
+            System.out.println(dml);
+            
+            Connection con = DataBaseConnections.getInstance().getConnection();
+            PreparedStatement pst = con.prepareStatement(dml);
+
+            int index = 1;
+            for (String field : dirtyFields.keySet()) {
+                pst.setObject(index, dirtyFields.get(field));
+                index++;
+            }
+            
+            if (AppConfig.getInstance().isVerbose()) {
+                System.out.println(pst);
+                pst.execute();
+                pst.close();
+                DataBaseConnections.getInstance().closeConnection(con);
+            }
+        }       
     }
-    
-    public void save(){
-        if ( isChangedEntity() ){
-            if( isNovelEntity() ){
+
+    public void save() throws SQLException {
+        if (isChangedEntity()) {
+            if (isNovelEntity()) {
                 insert();
                 setNovelEntity(false);
             } else {
@@ -73,4 +142,68 @@ public abstract class DataAcessObject {
         }
     }
     
+    public void delete() throws SQLException{
+        
+        String dml = "DELETE FROM " + getTableEntity() + " WHERE " + getWhereClauseForOneEntity();
+        
+        if(AppConfig.getInstance().isVerbose()){
+            System.out.println(dml);
+        }
+        
+        Connection con = DataBaseConnections.getInstance().getConnection();
+        Statement st = con.createStatement();
+        
+        st.execute(dml);
+        st.close();
+        
+        DataBaseConnections.getInstance().closeConnection(con);
+    }
+    
+    public boolean load() throws SQLException{
+        boolean resultado;
+        
+        String dql = "SELECT * FROM " + getTableEntity() + " WHERE " + getWhereClauseForOneEntity();
+        
+        if (AppConfig.getInstance().isVerbose()){
+            System.out.println(dql);
+        }
+        
+        Connection con = DataBaseConnections.getInstance().getConnection();
+        
+        Statement st = con.createStatement(); 
+
+        ResultSet rs = st.executeQuery(dql);
+        
+        resultado = rs.next();
+        
+        if(resultado){
+            
+            ArrayList<Object> data = new ArrayList();
+            
+            for(int i = 1; i <= rs.getMetaData().getColumnCount(); i++){
+                System.out.println(rs.getObject(i));
+                data.add(rs.getObject(i));
+            }
+            
+            fill(data);
+            setNovelEntity(false);
+        }
+        
+        st.close();
+        
+        DataBaseConnections.getInstance().closeConnection(con);
+        
+        return resultado;
+    }
+    
+    public <T extends DataAcessObject> ArrayList<T> getAllTableEntities(){
+        ArrayList<T> resultado = new ArrayList<>();
+        
+        return resultado;
+    }
+    
+    protected abstract String getWhereClauseForOneEntity();
+    protected abstract void fill(ArrayList<Object> data);
+    protected abstract <T extends DataAcessObject> T copy();
+
 }

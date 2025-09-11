@@ -1,5 +1,6 @@
 package model.framework;
 
+import controller.AppConfig;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.sql.DriverManager;
@@ -15,7 +16,7 @@ public class DataBaseConnections {
         pool = new ArrayList<>();
     }
     
-    public static DataBaseConnections getInstace(){
+    public static DataBaseConnections getInstance(){
         if ( singleton == null ){
             singleton = new DataBaseConnections();
         }
@@ -25,7 +26,10 @@ public class DataBaseConnections {
     public synchronized Connection getConnection() throws SQLException{
         Connection con;
         
-        con = DriverManager.getConnection("", "root", "root");
+        con = DriverManager.getConnection(
+                AppConfig.getInstance().getUrl(),
+                AppConfig.getInstance().getUser(),
+                AppConfig.getInstance().getPassword());
         pool.add(con);
         
         return con;
@@ -45,4 +49,7 @@ public class DataBaseConnections {
             }
         }
     }
+    
+    
+    
 }
