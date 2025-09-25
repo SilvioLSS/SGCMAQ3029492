@@ -6,22 +6,21 @@
     </head>
     <body>
         <div>GetPost Formulário
-            <form action="http://localhost:8080/SGCMAQ3029492/aulas/servlet/getpost/getpost_form.html" method="get">
+            <!--                <form action="http://localhost:8080/SGCMAQ3029492/aulas/servlet/getpost" method="get">-->
+            <form action="http://localhost:8080/SGCMAQ3029492/aulas/servlet/getpost" method="post">
                 <h2>Formulário</h2>
                 <p>
                     <label for="campoA">Campo A:</label>
-                    <input type="text" id="campoA" name="campoA"/><br /><br />
+                    <input type="text" id="campoA" name="campoA" pattern="\d+" title="apenas dígitos" required/><br /><br />
 
                     <label for="opcaoA">Opção A:</label>
-                    <input type="opcaoA" id="opcaoA" name="opcaoA" value="opcaoA"> <br><br>
+                    <input type="checkbox" id="opcaoA" name="opcaoA" value="opcaoA"/> <br/><br/>
 
                     <label for="opcaoB">Opção B:</label>
-                    <input type="opcaoB" id="opcaoB" name="opcaoB" value="opcaoB"> <br><br>
+                    <input type="checkbox" id="opcaoB" name="opcaoB" value="opcaoB"/> <br/><br/>
 
                     <input type="submit" name="btEnviar" value="Salvar">
                 </p>
-
-
             </form>
         </div>
     </body>
