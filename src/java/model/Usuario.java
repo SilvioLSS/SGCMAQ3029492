@@ -1,11 +1,11 @@
 package model;
 
 import java.util.ArrayList;
-import model.framework.DataAccessObject;
+import model.framework.DataAcessObject;
 
 // classe que representa a entidade usuário e herda de dataaccessobject
 // implementa o padrão dao para persistência de dados na tabela 'usuarios'
-public class Usuario extends DataAccessObject {
+public class Usuario extends DataAcessObject {
 
 // atributos mapeados para as colunas da tabela usuarios
     private int id;
@@ -75,7 +75,7 @@ public class Usuario extends DataAccessObject {
 
 // implementação do método abstrato para preencher o objeto com dados do resultset
     @Override
-    protected DataAccessObject fill(ArrayList data) {
+    protected DataAcessObject fill(ArrayList data) {
 // preenche os atributos na mesma ordem das colunas da tabela
         id = (int) data.get(0);
         nome = (String) data.get(1);

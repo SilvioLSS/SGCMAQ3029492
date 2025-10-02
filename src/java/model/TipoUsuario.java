@@ -68,14 +68,14 @@ public class TipoUsuario extends DataAcessObject{
         return "TipoUsuario{" + "id=" + id + ", nome=" + nome + ", moduloAdministrativo=" + moduloAdministrativo + ", moduloAgendamento=" + moduloAgendamento + ", moduloAtendimento=" + moduloAtendimento + '}';
     }
 
-    @Override
-    protected void fill(ArrayList<Object> data) {
+    protected DataAcessObject fill(ArrayList<Object> data) {
         //Segue a ordem das colunas da tabela no banco de dados.
         id = (int) data.get(0);
         nome = (String) data.get(1);
         moduloAdministrativo = (String) data.get(2);
         moduloAgendamento = (String) data.get(3);
         moduloAtendimento = (String) data.get(4);
+        return this;
     }
 
     @Override
