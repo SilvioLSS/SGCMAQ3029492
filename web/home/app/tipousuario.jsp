@@ -8,12 +8,14 @@
         <title>Tipo Usuário</title>
     </head>
     <body>
+        
         <% ArrayList<TipoUsuario> dados = new TipoUsuario().getAllTableEntities(); %>
+        
         <h1>Tipo Usuário</h1>
         
         <table>
             
-            <tr>                
+            <tr>
                 <th>ID</th>
                 <th>Nome</th>
                 <th>Administrativo</th>
@@ -22,24 +24,23 @@
                 <th></th>
                 <th></th>
             </tr>
-        
-            <% for( TipoUsuario tp: dados ){ %>
+            
+            <% for( TipoUsuario tp : dados ) { %>
             <tr>
                 <td><%= tp.getId() %></td>
                 <td><%= tp.getNome() %></td>
-                <td><%= tp.getModuloAdministrativo()%></td>
-                <td><%= tp.getModuloAgendamento()%></td>
-                <td><%= tp.getModuloAtendimento()%></td>
-                <td> <a href="<%= request.getContextPath()%>/home/tipousuario_form.jsp?action=update"> Alterar </a> </td>
-                <td> <a href="<%=request.getContextPath()%>/home/tipousuario?action=delete&id=<%=tp.getId()%>" onclick="return confirm('Deseja realmente excluir Tipo Usuario \n\
-<%=tp.getId()%> (<%=tp.getNome()%> )?')" > Excluir </a> </td>
+                <td><%= tp.getModuloAdministrativo() %></td>
+                <td><%= tp.getModuloAgendamento() %></td>
+                <td><%= tp.getModuloAtendimento() %></td>
+                
+                <td><a href="<%= request.getContextPath()  %>/home/app/tipousuario_form.jsp?action=update&id=<%= tp.getId()%>" >Alterar</a></td>
+                
+                <td><a href="<%= request.getContextPath() %>/home?action=delete&id=<%= tp.getId()%>&task=tipousuario" onclick="return confirm('Deseja realmente excluir Tipo Usuário <%= tp.getId()%> (<%= tp.getNome() %>) ?')">Excluir</a></td>
             </tr>
-            <% }%>
+            <% } %>
             
         </table>
-            <a href="<%= request.getContextPath()%>/home/tipousuario_form.jsp?action=create">Adicionar</a>
         
-        
-        
+            <a href="<%= request.getContextPath()  %>/home/app/tipousuario_form.jsp?action=create" >Adicionar</a>
     </body>
 </html>

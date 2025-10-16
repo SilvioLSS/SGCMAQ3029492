@@ -1,5 +1,7 @@
 package model;
 
+import java.math.BigInteger;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import model.framework.DataAcessObject;
 
@@ -57,14 +59,31 @@ public class Usuario extends DataAcessObject {
         addChange("cpf", this.cpf);
     }
 
-    public void setSenha(String senha) {
-        this.senha = senha;
-        addChange("senha", this.senha);
+    public void setSenha(String senha) throws Exception {
+        if (senha == null) {
+            if (this.senha != null) {
+                this.senha = senha;
+                addChange("senha", this.senha);
+            }
+        } else {
+            if (senha.equals(this.senha) == false) {
+
+                String senhaSal = getId() + senha + getId() / 2;
+
+                MessageDigest md = MessageDigest.getInstance("SHA-256");
+                String hash = new BigInteger(1, md.digest(senhaSal.getBytes("UTF-8"))).toString(16);
+
+                this.senha = hash;
+                addChange("senha", this.senha);
+            }
+        }
     }
 
     public void setTipoUsuarioId(int tipoUsuarioId) {
-        this.tipoUsuarioId = tipoUsuarioId;
-        addChange("tipo_usuario_id", this.tipoUsuarioId);
+        if (this.tipoUsuarioId != tipoUsuarioId) {
+            this.tipoUsuarioId = tipoUsuarioId;
+            addChange("tipo_usuario_id", this.tipoUsuarioId);
+        }
     }
 
 // implementação do método abstrato para definir a cláusula where
@@ -88,19 +107,17 @@ public class Usuario extends DataAcessObject {
 // implementação do método abstrato para criar uma cópia do objeto
     @Override
     protected Usuario copy() {
-        Usuario copia = new Usuario();
+        Usuario cp = new Usuario();
 
-// copia todos os atributos para o novo objeto
-        copia.setId(getId());
-        copia.setNome(getNome());
-        copia.setCpf(getCpf());
-        copia.setSenha(getSenha());
-        copia.setTipoUsuarioId(getTipoUsuarioId());
+        cp.setId(getId());
+        cp.setNome(getNome());
+        cp.setCpf(getCpf());
+        cp.senha = getSenha();
+        cp.setTipoUsuarioId(getTipoUsuarioId());
 
-// marca a cópia como não sendo uma nova entidade
-        copia.setNovelEntity(false);
+        cp.setNovelEntity(false);
 
-        return copia;
+        return cp;
     }
 
     @Override
